@@ -4,6 +4,7 @@ import { VideoPlayer } from "@/components/VideoPlayer";
 import { SubtitlePanel } from "@/components/SubtitlePanel";
 import { NotesDrawer } from "@/components/NotesDrawer";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
+import { RecordingsPanel } from "@/components/RecordingsPanel";
 import { toast } from "sonner";
 
 // Sample subtitle data
@@ -38,6 +39,31 @@ const initialSavedDialogues = [
   },
 ];
 
+// Sample recordings
+const initialRecordings = [
+  {
+    id: "rec-1",
+    timestamp: "00:38:42",
+    duration: "0:04",
+    dialogue: "Say my name.",
+    episode: "S5 E7 · Say My Name",
+  },
+  {
+    id: "rec-2",
+    timestamp: "00:42:24",
+    duration: "0:02",
+    dialogue: "I am the danger.",
+    episode: "S5 E14 · Ozymandias",
+  },
+];
+
+const videoInfo = {
+  title: "Breaking Bad",
+  season: 5,
+  episode: 14,
+  episodeTitle: "Ozymandias",
+};
+
 export default function Index() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [activeNavItem, setActiveNavItem] = useState("library");
@@ -48,6 +74,8 @@ export default function Index() {
   const [notesDrawerOpen, setNotesDrawerOpen] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [savedDialogues, setSavedDialogues] = useState(initialSavedDialogues);
+  const [recordingsPanelOpen, setRecordingsPanelOpen] = useState(false);
+  const [recordings, setRecordings] = useState(initialRecordings);
 
   const duration = 2820; // 47 minutes
 
@@ -70,7 +98,7 @@ export default function Index() {
           setIsPlaying(!isPlaying);
           break;
         case "r":
-          toast.success("Replaying line...");
+          toast.info("Replaying line...");
           break;
         case "s":
           handleSaveDialogue(sampleSubtitles[currentSubtitleIndex]);
@@ -79,8 +107,11 @@ export default function Index() {
           toast.info("Opening note editor...");
           break;
         case "m":
-          setIsRecording(!isRecording);
-          toast.success(isRecording ? "Recording stopped" : "Recording started");
+          if (isRecording) {
+            handleStopRecording();
+          } else {
+            handleStartRecording();
+          }
           break;
         case "d":
           setNotesDrawerOpen(!notesDrawerOpen);
@@ -90,6 +121,7 @@ export default function Index() {
           break;
         case "escape":
           setShowShortcuts(false);
+          setRecordingsPanelOpen(false);
           break;
       }
     };
@@ -107,12 +139,31 @@ export default function Index() {
       hasRecording: false,
     };
     setSavedDialogues((prev) => [newDialogue, ...prev]);
-    toast.success("Dialogue saved!");
+    toast.success("Dialogue saved");
   }, []);
+
+  const handleStartRecording = () => {
+    setIsRecording(true);
+    setRecordingsPanelOpen(true);
+    toast.info("Recording started");
+  };
+
+  const handleStopRecording = () => {
+    const currentLine = sampleSubtitles[currentSubtitleIndex];
+    const newRecording = {
+      id: `rec-${Date.now()}`,
+      timestamp: currentLine.timestamp,
+      duration: "0:03",
+      dialogue: currentLine.text,
+      episode: "S5 E14 · Ozymandias",
+    };
+    setRecordings((prev) => [newRecording, ...prev]);
+    setIsRecording(false);
+    toast.success("Recording saved");
+  };
 
   const handleSeek = (time: number) => {
     setCurrentTime(time);
-    // Find the corresponding subtitle
     const index = sampleSubtitles.findIndex(
       (s, i) =>
         s.startTime <= time &&
@@ -140,25 +191,10 @@ export default function Index() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
-        <header className="h-14 flex items-center justify-between px-6 border-b border-border/30">
-          <div className="flex items-center gap-4">
-            <h1 className="font-display text-lg font-semibold text-foreground">
-              Breaking Bad
-            </h1>
-            <span className="text-sm text-muted-foreground">S5 E14 · "Ozymandias"</span>
-          </div>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <span>Press</span>
-            <kbd className="px-1.5 py-0.5 bg-secondary rounded font-mono">?</kbd>
-            <span>for shortcuts</span>
-          </div>
-        </header>
-
         {/* Main Area */}
         <div className="flex-1 flex min-h-0">
           {/* Player Section */}
-          <div className="flex-1 p-6 min-w-0 relative">
+          <div className="flex-1 p-4 min-w-0 relative">
             <div className="h-full flex flex-col">
               <VideoPlayer
                 isPlaying={isPlaying}
@@ -168,6 +204,7 @@ export default function Index() {
                 onSeek={handleSeek}
                 markers={timelineMarkers}
                 isRecording={isRecording}
+                videoInfo={videoInfo}
               />
             </div>
 
@@ -187,27 +224,41 @@ export default function Index() {
           </div>
 
           {/* Subtitle Panel */}
-          <div className="w-80 p-6 pl-0">
+          <div className="w-72 p-4 pl-0">
             <SubtitlePanel
               subtitles={sampleSubtitles}
               currentIndex={currentSubtitleIndex}
               onLineClick={handleLineClick}
               onSaveDialogue={handleSaveDialogue}
               onAddNote={(line) => toast.info(`Adding note to: "${line.text}"`)}
-              onStartRecording={() => {
-                setIsRecording(true);
-                toast.success("Recording started");
-              }}
-              onStopRecording={() => {
-                setIsRecording(false);
-                toast.success("Recording saved!");
-              }}
+              onOpenRecordings={() => setRecordingsPanelOpen(true)}
               onReplayLine={() => toast.info("Replaying line...")}
-              isRecording={isRecording}
             />
           </div>
         </div>
+
+        {/* Keyboard shortcut hint */}
+        <div className="flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground border-t border-border/30">
+          <span>Press</span>
+          <kbd className="px-1.5 py-0.5 bg-secondary/60 rounded text-xs font-mono">?</kbd>
+          <span>for shortcuts</span>
+        </div>
       </div>
+
+      {/* Recordings Panel */}
+      <RecordingsPanel
+        isOpen={recordingsPanelOpen}
+        onClose={() => setRecordingsPanelOpen(false)}
+        recordings={recordings}
+        onPlay={(id) => toast.info(`Playing recording: ${id}`)}
+        onDelete={(id) => {
+          setRecordings((prev) => prev.filter((r) => r.id !== id));
+          toast.success("Recording deleted");
+        }}
+        onStartNewRecording={handleStartRecording}
+        isRecording={isRecording}
+        onStopRecording={handleStopRecording}
+      />
 
       {/* Keyboard Shortcuts Modal */}
       <KeyboardShortcuts
