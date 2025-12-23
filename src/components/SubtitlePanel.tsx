@@ -1,4 +1,4 @@
-import { Bookmark, Edit3, Mic, RotateCcw, StopCircle } from "lucide-react";
+import { Bookmark, Edit3, Mic, RotateCcw } from "lucide-react";
 
 interface SubtitleLine {
   id: string;
@@ -13,10 +13,8 @@ interface SubtitlePanelProps {
   onLineClick: (startTime: number) => void;
   onSaveDialogue: (line: SubtitleLine) => void;
   onAddNote: (line: SubtitleLine) => void;
-  onStartRecording: () => void;
-  onStopRecording: () => void;
+  onOpenRecordings: () => void;
   onReplayLine: () => void;
-  isRecording: boolean;
 }
 
 export function SubtitlePanel({
@@ -25,10 +23,8 @@ export function SubtitlePanel({
   onLineClick,
   onSaveDialogue,
   onAddNote,
-  onStartRecording,
-  onStopRecording,
+  onOpenRecordings,
   onReplayLine,
-  isRecording,
 }: SubtitlePanelProps) {
   const getLineClass = (index: number) => {
     const diff = index - currentIndex;
@@ -41,9 +37,9 @@ export function SubtitlePanel({
   const getLineOpacity = (index: number) => {
     const diff = Math.abs(index - currentIndex);
     if (diff === 0) return "opacity-100";
-    if (diff === 1) return "opacity-70";
+    if (diff === 1) return "opacity-75";
     if (diff === 2) return "opacity-50";
-    return "opacity-30";
+    return "opacity-35";
   };
 
   const visibleRange = 3;
@@ -54,16 +50,15 @@ export function SubtitlePanel({
   const currentLine = subtitles[currentIndex];
 
   return (
-    <div className="flex flex-col h-full glass-panel rounded-xl">
+    <div className="flex flex-col h-full bg-card/40 border border-border/30 rounded-lg">
       {/* Header */}
-      <div className="px-5 py-4 border-b border-border/50">
-        <h2 className="font-display font-semibold text-foreground">Subtitles</h2>
-        <p className="text-xs text-muted-foreground mt-1">Click any line to jump</p>
+      <div className="px-4 py-3 border-b border-border/30">
+        <h2 className="font-medium text-sm text-foreground">Subtitles</h2>
       </div>
 
       {/* Subtitle Lines */}
-      <div className="flex-1 overflow-hidden py-4">
-        <div className="h-full flex flex-col justify-center px-3 space-y-2">
+      <div className="flex-1 overflow-hidden py-3">
+        <div className="h-full flex flex-col justify-center px-2 space-y-1">
           {visibleSubtitles.map((line, idx) => {
             const actualIndex = startIndex + idx;
             const isCurrent = actualIndex === currentIndex;
@@ -73,16 +68,14 @@ export function SubtitlePanel({
                 key={line.id}
                 onClick={() => onLineClick(line.startTime)}
                 className={`subtitle-line ${getLineClass(actualIndex)} ${getLineOpacity(actualIndex)} ${
-                  isCurrent ? "bg-primary/5 border-l-2 border-primary" : ""
+                  isCurrent ? "bg-secondary/40" : ""
                 }`}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2">
                   <span className="text-xs font-mono text-muted-foreground shrink-0 pt-0.5">
                     {line.timestamp}
                   </span>
-                  <p className={`leading-relaxed ${isCurrent ? "text-glow" : ""}`}>
-                    {line.text}
-                  </p>
+                  <p className="leading-relaxed">{line.text}</p>
                 </div>
               </div>
             );
@@ -91,44 +84,34 @@ export function SubtitlePanel({
       </div>
 
       {/* Dialogue Controls */}
-      <div className="p-4 border-t border-border/50 space-y-3">
-        <div className="grid grid-cols-2 gap-2">
+      <div className="p-3 border-t border-border/30 space-y-2">
+        <div className="grid grid-cols-2 gap-1.5">
           <button
             onClick={() => currentLine && onSaveDialogue(currentLine)}
-            className="control-pill justify-center"
+            className="control-pill justify-center text-xs"
           >
-            <Bookmark className="w-4 h-4" />
+            <Bookmark className="w-3.5 h-3.5" />
             <span>Save</span>
           </button>
           <button
             onClick={() => currentLine && onAddNote(currentLine)}
-            className="control-pill justify-center"
+            className="control-pill justify-center text-xs"
           >
-            <Edit3 className="w-4 h-4" />
-            <span>Add Note</span>
+            <Edit3 className="w-3.5 h-3.5" />
+            <span>Note</span>
           </button>
         </div>
         
-        <div className="grid grid-cols-2 gap-2">
-          {isRecording ? (
-            <button
-              onClick={onStopRecording}
-              className="control-pill control-pill-active justify-center col-span-1"
-            >
-              <StopCircle className="w-4 h-4" />
-              <span>Stop</span>
-            </button>
-          ) : (
-            <button
-              onClick={onStartRecording}
-              className="control-pill justify-center"
-            >
-              <Mic className="w-4 h-4" />
-              <span>Record</span>
-            </button>
-          )}
-          <button onClick={onReplayLine} className="control-pill justify-center">
-            <RotateCcw className="w-4 h-4" />
+        <div className="grid grid-cols-2 gap-1.5">
+          <button
+            onClick={onOpenRecordings}
+            className="control-pill justify-center text-xs"
+          >
+            <Mic className="w-3.5 h-3.5" />
+            <span>Record</span>
+          </button>
+          <button onClick={onReplayLine} className="control-pill justify-center text-xs">
+            <RotateCcw className="w-3.5 h-3.5" />
             <span>Replay</span>
           </button>
         </div>
