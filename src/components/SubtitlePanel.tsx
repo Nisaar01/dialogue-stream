@@ -42,7 +42,7 @@ export function SubtitlePanel({
     return "opacity-35";
   };
 
-  const visibleRange = 3;
+  const visibleRange = 8;
   const startIndex = Math.max(0, currentIndex - visibleRange);
   const endIndex = Math.min(subtitles.length - 1, currentIndex + visibleRange);
   const visibleSubtitles = subtitles.slice(startIndex, endIndex + 1);
