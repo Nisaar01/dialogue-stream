@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { Sidebar } from "@/components/Sidebar";
 import { VideoPlayer } from "@/components/VideoPlayer";
 import { SubtitlePanel } from "@/components/SubtitlePanel";
+import { NotesDrawer } from "@/components/NotesDrawer";
 import { KeyboardShortcuts } from "@/components/KeyboardShortcuts";
 import { RecordingsPanel } from "@/components/RecordingsPanel";
 import { toast } from "sonner";
@@ -17,14 +18,6 @@ const sampleSubtitles = [
   { id: "7", text: "I am the one who knocks.", timestamp: "00:42:35", startTime: 2555 },
   { id: "8", text: "Walt...", timestamp: "00:42:40", startTime: 2560 },
   { id: "9", text: "I... I don't know what to say.", timestamp: "00:42:43", startTime: 2563 },
-  { id: "10", text: "What happened to you?", timestamp: "00:42:47", startTime: 2567 },
-  { id: "11", text: "You used to be so different.", timestamp: "00:42:50", startTime: 2570 },
-  { id: "12", text: "I did what I had to do.", timestamp: "00:42:54", startTime: 2574 },
-  { id: "13", text: "For the family.", timestamp: "00:42:57", startTime: 2577 },
-  { id: "14", text: "This isn't about family anymore.", timestamp: "00:43:01", startTime: 2581 },
-  { id: "15", text: "This is about you.", timestamp: "00:43:04", startTime: 2584 },
-  { id: "16", text: "Everything I did, I did for us.", timestamp: "00:43:08", startTime: 2588 },
-  { id: "17", text: "You need to understand that.", timestamp: "00:43:12", startTime: 2592 },
 ];
 
 // Sample saved dialogues
@@ -214,6 +207,20 @@ export default function Index() {
                 videoInfo={videoInfo}
               />
             </div>
+
+            {/* Notes Drawer */}
+            <NotesDrawer
+              isOpen={notesDrawerOpen}
+              onToggle={() => setNotesDrawerOpen(!notesDrawerOpen)}
+              savedDialogues={savedDialogues}
+              onJumpTo={(id) => toast.info(`Jumping to dialogue: ${id}`)}
+              onEditNote={(id) => toast.info(`Editing note: ${id}`)}
+              onDelete={(id) => {
+                setSavedDialogues((prev) => prev.filter((d) => d.id !== id));
+                toast.success("Dialogue deleted");
+              }}
+              onPlayRecording={(id) => toast.info(`Playing recording: ${id}`)}
+            />
           </div>
 
           {/* Subtitle Panel */}
@@ -230,6 +237,12 @@ export default function Index() {
           </div>
         </div>
 
+        {/* Keyboard shortcut hint */}
+        <div className="flex items-center justify-center gap-2 py-2 text-xs text-muted-foreground border-t border-border/30">
+          <span>Press</span>
+          <kbd className="px-1.5 py-0.5 bg-secondary/60 rounded text-xs font-mono">?</kbd>
+          <span>for shortcuts</span>
+        </div>
       </div>
 
       {/* Recordings Panel */}
