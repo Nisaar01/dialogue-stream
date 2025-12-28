@@ -14,7 +14,243 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      notes: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          saved_dialogue_id: string | null
+          timestamp: number | null
+          updated_at: string | null
+          video_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          saved_dialogue_id?: string | null
+          timestamp?: number | null
+          updated_at?: string | null
+          video_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          saved_dialogue_id?: string | null
+          timestamp?: number | null
+          updated_at?: string | null
+          video_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notes_saved_dialogue_id_fkey"
+            columns: ["saved_dialogue_id"]
+            isOneToOne: false
+            referencedRelation: "saved_dialogues"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "notes_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      recordings: {
+        Row: {
+          audio_url: string | null
+          created_at: string | null
+          dialogue_text: string | null
+          duration: number
+          end_time: number
+          id: string
+          start_time: number
+          video_id: string
+        }
+        Insert: {
+          audio_url?: string | null
+          created_at?: string | null
+          dialogue_text?: string | null
+          duration: number
+          end_time: number
+          id?: string
+          start_time: number
+          video_id: string
+        }
+        Update: {
+          audio_url?: string | null
+          created_at?: string | null
+          dialogue_text?: string | null
+          duration?: number
+          end_time?: number
+          id?: string
+          start_time?: number
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recordings_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_dialogues: {
+        Row: {
+          created_at: string | null
+          episode_info: string | null
+          id: string
+          subtitle_id: string | null
+          text: string
+          timestamp: number
+          video_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          episode_info?: string | null
+          id?: string
+          subtitle_id?: string | null
+          text: string
+          timestamp: number
+          video_id: string
+        }
+        Update: {
+          created_at?: string | null
+          episode_info?: string | null
+          id?: string
+          subtitle_id?: string | null
+          text?: string
+          timestamp?: number
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_dialogues_subtitle_id_fkey"
+            columns: ["subtitle_id"]
+            isOneToOne: false
+            referencedRelation: "subtitles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_dialogues_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      subtitles: {
+        Row: {
+          created_at: string | null
+          end_time: number
+          id: string
+          speaker: string | null
+          start_time: number
+          text: string
+          video_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          end_time: number
+          id?: string
+          speaker?: string | null
+          start_time: number
+          text: string
+          video_id: string
+        }
+        Update: {
+          created_at?: string | null
+          end_time?: number
+          id?: string
+          speaker?: string | null
+          start_time?: number
+          text?: string
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "subtitles_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: false
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      videos: {
+        Row: {
+          created_at: string | null
+          duration: number | null
+          episode: number | null
+          id: string
+          season: number | null
+          series_name: string | null
+          thumbnail_url: string | null
+          title: string
+          updated_at: string | null
+          video_url: string
+        }
+        Insert: {
+          created_at?: string | null
+          duration?: number | null
+          episode?: number | null
+          id?: string
+          season?: number | null
+          series_name?: string | null
+          thumbnail_url?: string | null
+          title: string
+          updated_at?: string | null
+          video_url: string
+        }
+        Update: {
+          created_at?: string | null
+          duration?: number | null
+          episode?: number | null
+          id?: string
+          season?: number | null
+          series_name?: string | null
+          thumbnail_url?: string | null
+          title?: string
+          updated_at?: string | null
+          video_url?: string
+        }
+        Relationships: []
+      }
+      watch_progress: {
+        Row: {
+          id: string
+          last_watched_at: string | null
+          playback_position: number | null
+          video_id: string
+        }
+        Insert: {
+          id?: string
+          last_watched_at?: string | null
+          playback_position?: number | null
+          video_id: string
+        }
+        Update: {
+          id?: string
+          last_watched_at?: string | null
+          playback_position?: number | null
+          video_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "watch_progress_video_id_fkey"
+            columns: ["video_id"]
+            isOneToOne: true
+            referencedRelation: "videos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
