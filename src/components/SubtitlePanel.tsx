@@ -57,8 +57,8 @@ export function SubtitlePanel({
       </div>
 
       {/* Subtitle Lines */}
-      <div className="flex-1 overflow-hidden py-3">
-        <div className="h-full flex flex-col justify-center px-2 space-y-1">
+      <div className="flex-1 overflow-hidden py-4">
+        <div className="h-full flex flex-col justify-center px-4 space-y-2">
           {visibleSubtitles.map((line, idx) => {
             const actualIndex = startIndex + idx;
             const isCurrent = actualIndex === currentIndex;
@@ -68,14 +68,14 @@ export function SubtitlePanel({
                 key={line.id}
                 onClick={() => onLineClick(line.startTime)}
                 className={`subtitle-line ${getLineClass(actualIndex)} ${getLineOpacity(actualIndex)} ${
-                  isCurrent ? "bg-secondary/40" : ""
-                }`}
+                  isCurrent ? "bg-secondary/40 py-3" : "py-2"
+                } flex-1 flex items-center`}
               >
-                <div className="flex items-start gap-2">
-                  <span className="text-xs font-mono text-muted-foreground shrink-0 pt-0.5">
+                <div className="flex items-center gap-3 w-full">
+                  <span className={`font-mono text-muted-foreground shrink-0 ${isCurrent ? "text-sm" : "text-xs"}`}>
                     {line.timestamp}
                   </span>
-                  <p className="leading-relaxed">{line.text}</p>
+                  <p className={`leading-relaxed ${isCurrent ? "text-lg font-medium" : "text-base"}`}>{line.text}</p>
                 </div>
               </div>
             );
